@@ -280,7 +280,7 @@ class Html2Text
             return call_user_func_array(array($this, 'legacyConstruct'), func_get_args());
         }
 
-        // Strip out comments as conditional comments for legacy email support break things
+        // Strip out comments since conditional comments for legacy email support break things
         $this->html = preg_replace('/<!--.*?-->/s', '', $html);
         $this->options = array_merge($this->options, $options);
         $this->htmlFuncFlags = (PHP_VERSION_ID < 50400)
