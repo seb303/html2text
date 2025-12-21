@@ -280,7 +280,8 @@ class Html2Text
             return call_user_func_array(array($this, 'legacyConstruct'), func_get_args());
         }
 
-        $this->html = $html;
+        // Strip out comments as conditional comments for legacy email support break things
+        $this->html = preg_replace('/<!--.*?-->/s', '', $html);
         $this->options = array_merge($this->options, $options);
         $this->htmlFuncFlags = (PHP_VERSION_ID < 50400)
             ? ENT_QUOTES
