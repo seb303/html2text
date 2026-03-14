@@ -131,7 +131,7 @@ class Html2Text
         "\n",                            // <tr> and </tr>
         "\t\t\\1\n",                     // <td> and </td>
         "",                              // <span class="_html2text_ignore">...</span>
-        '[\\2]',                         // <img> with alt tag
+        '',                              // Remove <img>
     );
 
     /**
@@ -261,6 +261,7 @@ class Html2Text
                                 //  No adding _ around italic text (<i> <em> and <ins> tags)
                                 //  No adding * for <li> or <dt>
                                 //  <hr> is replaced by "\n\n" rather than "\n-------------------------\n"
+                                //  <img> tags are removed rather than replacing with [alt text]
         
         'basic_whitespace' => false,    // If true then:
                                         // Extra whitespace around text is stripped.
