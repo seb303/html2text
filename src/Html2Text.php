@@ -261,6 +261,13 @@ class Html2Text
                                 //  No adding _ around italic text (<i> <em> and <ins> tags)
                                 //  No adding * for <li> or <dt>
                                 //  <hr> is replaced by "\n\n" rather than "\n-------------------------\n"
+        
+        'basic_whitespace' => false,    // If true then:
+                                        // Extra whitespace around text is stripped.
+                                        // Extra whitespace at start or end of lines is stripped.
+                                        // Non-breaking space characters are converted to normal spaces.
+                                        // Tabs are converted to spaces.
+                                        // Consecutive spaces are collapsed.
     );
 
     private function legacyConstruct($html = '', $fromFile = false, array $options = array())
@@ -420,6 +427,10 @@ class Html2Text
         $text = strip_tags($text);
         $text = preg_replace($this->entSearch, $this->entReplace, $text);
         $text = html_entity_decode($text, $this->htmlFuncFlags, self::ENCODING);
+        if ($this->options['basic_whitespace']) {
+            // Convert non-breaking spaces and tabs to normal spaces
+            $text = preg_replace("/\xC2\xA0|\t+/", " ", $text);
+        }
 
         // Remove unknown/unhandled entities (this cannot be done in search-and-replace block)
         $text = preg_replace('/&([a-zA-Z0-9]{2,6}|#[0-9]{2,4});/', '', $text);
@@ -431,12 +442,20 @@ class Html2Text
         // Normalise empty lines
         $text = preg_replace("/\n(\xC2\xA0|\s)+\n/", "\n\n", $text);
         $text = preg_replace("/\n{3,}/", "\n\n", $text);
-
-        // remove leading empty lines (can be produced by eg. P tag on the beginning)
-        $text = ltrim($text, "\n");
-
-        // remove trailing white space
-        $text = preg_replace("/[(\xC2\xA0|\s)]+$/", "", $text);
+        
+        if ($this->options['basic_whitespace']) {
+            // Collapse multiple spaces
+            $text = preg_replace("/ +/", " ", $text);
+            // Trim whitespace from start and end
+            $text = trim($text);
+            // Trim whitespace from start and end of each line
+            $text = preg_replace('/(^[^\S\r\n]+|[^\S\r\n]+$)/m', '', $text);
+        } else {
+            // remove leading empty lines (can be produced by eg. P tag on the beginning)
+            $text = ltrim($text, "\n");
+            // remove trailing white space
+            $text = preg_replace("/(\xC2\xA0|\s)+$/", "", $text);
+        }
 
         if ($this->options['width'] > 0) {
             $text = wordwrap($text, $this->options['width']);
