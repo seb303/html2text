@@ -509,7 +509,7 @@ class Html2Text
             if ($url === $display) {
                 return $display;
             }
-            return $display . "\n[" . $url . ']';
+            return $display . "\n$url\n";
         } elseif ($linkMethod == 'bbcode') {
             return sprintf('[url=%s]%s[/url]', $url, $display);
         } else { // link_method defaults to inline
